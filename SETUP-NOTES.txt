@@ -1,0 +1,18 @@
+HASHU / CHATHUWA BOT - LOCAL DATABASE BUILD
+
+MongoDB is not required. Bot settings, OTP records, active numbers and saved session
+credentials are stored in data/local-db.json.
+
+Owner number default: 94765342804
+You can override it by setting OWNER_NUMBER in your hosting environment.
+
+Run:
+  npm install
+  npm start
+
+Important:
+- This project needs a Node.js host (not static PHP-only hosting).
+- The host must allow persistent disk/file writes for data/local-db.json and the auth/session files.
+- If your host uses ephemeral storage, saved sessions may disappear after redeploy/restart.
+- Pair only a WhatsApp account you own or are authorized to manage.
+- Do not publish your session credentials or local-db.json.
