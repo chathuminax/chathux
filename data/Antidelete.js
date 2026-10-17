@@ -2,37 +2,36 @@
 const fs = require('fs');
 const path = require('path');
 
-const dataDir = path.join(__dirname, '..', 'data');
-const dbFile = path.join(dataDir, 'antidelete.json');
+const DB_FILE = path.join(__dirname, 'antidelete.json');
 
 function readData() {
+    if (!fs.existsSync(DB_FILE)) {
+        fs.writeFileSync(DB_FILE, '{}');
+    }
+
     try {
-        if (!fs.existsSync(dataDir)) {
-            fs.mkdirSync(dataDir, { recursive: true });
-        }
-
-        if (!fs.existsSync(dbFile)) {
-            fs.writeFileSync(dbFile, '{}');
-        }
-
-        return JSON.parse(fs.readFileSync(dbFile, 'utf8'));
+        return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
     } catch (error) {
-        console.error('Antidelete database error:', error.message);
+        console.error('Antidelete read error:', error.message);
         return {};
     }
 }
 
 function writeData(data) {
-    if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
-    }
+    const tempFile = DB_FILE + '.tmp';
 
-    fs.writeFileSync(dbFile, JSON.stringify(data, null, 2));
+    fs.writeFileSync(tempFile, JSON.stringify(data, null, 2));
+    fs.renameSync(tempFile, DB_FILE);
 }
 
 const getAntideleteStatus = async (chatId) => {
-    const data = readData();
-    return data[chatId] === true;
+    try {
+        const data = readData();
+        return data[chatId] === true;
+    } catch (error) {
+        console.error('Antidelete status error:', error.message);
+        return false;
+    }
 };
 
 const setAntideleteStatus = async (chatId, status) => {
@@ -42,7 +41,7 @@ const setAntideleteStatus = async (chatId, status) => {
         writeData(data);
         return true;
     } catch (error) {
-        console.error('Failed to save antidelete status:', error.message);
+        console.error('Antidelete update error:', error.message);
         return false;
     }
 };
